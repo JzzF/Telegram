@@ -1,5 +1,6 @@
 class GameState {
     constructor() {
+        this.scoring = new ScoringSystem();
         this.reset();
         this.tetrominoGenerator = new TetrominoGenerator();
         this.highScore = parseInt(localStorage.getItem('highScore')) || 0;
@@ -20,6 +21,7 @@ class GameState {
         this.lastMoveTime = 0;
         this.dropInterval = CONFIG.INITIAL_DELAY;
         this.piecesSincePreview = 0;
+        this.scoring.reset();
     }
 
     getCurrentPhase() {
@@ -60,9 +62,9 @@ class GameState {
     }
 
     updateHighScore() {
-        if (this.score > this.highScore) {
-            this.highScore = this.score;
-            localStorage.setItem('highScore', this.highScore.toString());
+        if (this.getScore() > this.getHighScore()) {
+            this.scoring.setHighScore(this.getScore());
+            localStorage.setItem('highScore', this.getHighScore().toString());
         }
     }
 
@@ -159,8 +161,10 @@ class GameState {
             this.board.unshift(Array(CONFIG.BOARD.WIDTH).fill(0));
         });
 
-        // Calculate score
+        // Calculate score and update total lines cleared
         const scoreResult = this.scoring.calculateLinesClear(linesCleared);
+        this.linesCleared += linesCleared;
+        this.score = this.scoring.getScore();
         
         return {
             lines: clearedRows,
@@ -171,9 +175,14 @@ class GameState {
     }
 
     calculateTimeBonus() {
-        if (this.timeRemaining > 0) {
-            return Math.floor(this.linesCleared * (this.timeRemaining / 10) * CONFIG.SCORING.TIME_BONUS_MULTIPLIER);
-        }
-        return 0;
+        return this.scoring.calculateTimeBonus(this.timeRemaining);
+    }
+
+    getScore() {
+        return this.scoring.getScore();
+    }
+
+    getHighScore() {
+        return this.scoring.getHighScore();
     }
 }

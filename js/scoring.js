@@ -43,6 +43,11 @@ class ScoringSystem {
         }
     }
 
+    setHighScore(score) {
+        this.highScore = score;
+        localStorage.setItem('highScore', this.highScore.toString());
+    }
+
     reset() {
         this.score = 0;
         this.combo = 0;
