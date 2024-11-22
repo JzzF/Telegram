@@ -1,0 +1,105 @@
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px var(--tg-theme-button-color);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--tg-theme-button-color);
+    }
+    100% {
+        box-shadow: 0 0 5px var(--tg-theme-button-color);
+    }
+}
+
+@keyframes scorePopup {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+
+@keyframes comboFlash {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        color: #ffeb3b;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes linesClear {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes phaseTransition {
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.5);
+    }
+}
+
+.glow-button {
+    animation: glow 2s infinite;
+}
+
+.score-popup {
+    position: absolute;
+    color: #ffeb3b;
+    font-size: 24px;
+    font-weight: bold;
+    pointer-events: none;
+    animation: scorePopup 1s ease-out forwards;
+}
+
+.combo-flash {
+    animation: comboFlash 0.5s ease-out;
+}
+
+.lines-clear {
+    animation: linesClear 0.3s ease-out;
+}
+
+.phase-transition {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: var(--tg-theme-button-color);
+    text-align: center;
+    animation: phaseTransition 2s ease-out forwards;
+    pointer-events: none;
+}
+
+.hidden {
+    display: none !important;
+}
