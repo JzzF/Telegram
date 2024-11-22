@@ -2,8 +2,8 @@ class Renderer {
     constructor(gameCanvas, previewCanvas) {
         this.gameCanvas = gameCanvas;
         this.previewCanvas = previewCanvas;
-        this.gameCtx = gameCanvas.initContext();
-        this.previewCtx = previewCanvas.initContext();
+        this.gameCtx = gameCanvas.getContext('2d');
+        this.previewCtx = previewCanvas.getContext('2d');
         this.setupCanvases();
     }
 
