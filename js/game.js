@@ -126,10 +126,10 @@ class Game {
         this.gameState.lockPiece();
         const clearResult = this.gameState.clearLines();
         
-        if (clearResult) {
+        if (clearResult && clearResult.lines.length > 0) {
             // Play line clear animation and sound
-            this.animationManager.playLinesClearAnimation(clearResult.lines);
-            this.audioManager.playLineClear(clearResult.lines);
+            this.animationManager.playLinesClearAnimation(clearResult);
+            this.audioManager.playLineClear(clearResult.lines.length);
             
             // Show score popup
             const canvas = document.getElementById('game-canvas');

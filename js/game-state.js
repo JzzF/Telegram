@@ -143,6 +143,7 @@ class GameState {
         let linesCleared = 0;
         let clearedRows = [];
 
+        // Find completed lines
         for (let row = CONFIG.BOARD.HEIGHT - 1; row >= 0; row--) {
             if (this.board[row].every(cell => cell !== 0)) {
                 clearedRows.push(row);
@@ -150,36 +151,23 @@ class GameState {
             }
         }
 
-        if (linesCleared > 0) {
-            // Remove cleared lines
-            clearedRows.forEach(row => {
-                this.board.splice(row, 1);
-                this.board.unshift(Array(CONFIG.BOARD.WIDTH).fill(0));
-            });
+        if (linesCleared === 0) return null;
 
-            // Update score
-            const baseScore = CONFIG.SCORING.LINES[linesCleared];
-            const phaseMultiplier = CONFIG.SCORING.PHASE_MULTIPLIER[this.currentPhase];
-            let comboMultiplier = 1;
+        // Remove completed lines
+        clearedRows.forEach(row => {
+            this.board.splice(row, 1);
+            this.board.unshift(Array(CONFIG.BOARD.WIDTH).fill(0));
+        });
 
-            if (this.combo > 0) {
-                comboMultiplier = CONFIG.SCORING.COMBO_MULTIPLIER[Math.min(this.combo + 1, 4)] || 1;
-            }
-
-            const points = baseScore * phaseMultiplier * comboMultiplier;
-            this.score += points;
-            this.combo++;
-            this.linesCleared += linesCleared;
-
-            return {
-                lines: linesCleared,
-                points,
-                combo: this.combo
-            };
-        } else {
-            this.combo = 0;
-            return null;
-        }
+        // Calculate score
+        const scoreResult = this.scoring.calculateLinesClear(linesCleared);
+        
+        return {
+            lines: clearedRows,
+            count: linesCleared,
+            points: scoreResult.points,
+            combo: scoreResult.combo
+        };
     }
 
     calculateTimeBonus() {

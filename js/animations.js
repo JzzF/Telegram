@@ -4,12 +4,14 @@ class AnimationManager {
         this.activeAnimations = new Set();
     }
 
-    playLinesClearAnimation(rows, callback) {
+    playLinesClearAnimation(clearResult, callback) {
+        if (!clearResult || !clearResult.lines || clearResult.lines.length === 0) return;
+        
         const animationId = Symbol('linesClear');
         this.activeAnimations.add(animationId);
 
         // Create flash effect for each row
-        rows.forEach(row => {
+        clearResult.lines.forEach(row => {
             const rowBlocks = [];
             for (let x = 0; x < CONFIG.BOARD.WIDTH; x++) {
                 const block = document.createElement('div');
