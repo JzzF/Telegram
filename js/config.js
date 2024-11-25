@@ -5,21 +5,21 @@ const CONFIG = {
             1: {
                 START_TIME: 90,
                 END_TIME: 60,
-                SPEED: 1.5,
+                SPEED: 1.8,
                 PREVIEW: true,
                 PREVIEW_FREQUENCY: 1
             },
             2: {
                 START_TIME: 60,
                 END_TIME: 30,
-                SPEED: 1.8,
+                SPEED: 2.5,
                 PREVIEW: true,
                 PREVIEW_FREQUENCY: 2
             },
             3: {
                 START_TIME: 30,
                 END_TIME: 0,
-                SPEED: 3.3,
+                SPEED: 4,
                 PREVIEW: false,
                 PREVIEW_FREQUENCY: 0
             }
