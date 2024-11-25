@@ -133,26 +133,21 @@ class Game {
         this.gameState.gameOver = true;
         this.audioManager.cleanup();
         
-        // Calculate final score with time bonus
-        const timeBonus = this.gameState.calculateTimeBonus();
-        const finalScore = this.gameState.score + timeBonus;
-        
-        // Update high score
-        if (finalScore > this.gameState.highScore) {
-            this.gameState.highScore = finalScore;
-            localStorage.setItem('highScore', finalScore.toString());
-        }
-        
         // Play game over animation
         this.animationManager.playGameOverAnimation(() => {
             // Show game over screen
             document.getElementById('game-screen').classList.add('hidden');
             document.getElementById('game-over-screen').classList.remove('hidden');
             
-            // Update score displays
+            // Update score display
             document.getElementById('final-score').textContent = this.gameState.score;
-            document.getElementById('time-bonus').textContent = timeBonus;
-            document.getElementById('total-score').textContent = finalScore;
+            document.getElementById('total-score').textContent = this.gameState.score;
+            
+            // Update high score if needed
+            if (this.gameState.score > this.gameState.highScore) {
+                this.gameState.highScore = this.gameState.score;
+                localStorage.setItem('highScore', this.gameState.score.toString());
+            }
         });
     }
 

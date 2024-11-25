@@ -29,12 +29,6 @@ class ScoringSystem {
         };
     }
 
-    calculateTimeBonus(timeRemaining) {
-        const bonus = Math.floor(timeRemaining * 100); // 100 points per second remaining
-        this.addPoints(bonus);
-        return bonus;
-    }
-
     addPoints(points) {
         this.score += points;
         if (this.score > this.highScore) {
