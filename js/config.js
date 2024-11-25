@@ -12,14 +12,14 @@ const CONFIG = {
             2: {
                 START_TIME: 60,
                 END_TIME: 30,
-                SPEED: 2,
+                SPEED: 1.8,
                 PREVIEW: true,
                 PREVIEW_FREQUENCY: 2
             },
             3: {
                 START_TIME: 30,
                 END_TIME: 0,
-                SPEED: 3,
+                SPEED: 3.3,
                 PREVIEW: false,
                 PREVIEW_FREQUENCY: 0
             }
@@ -47,7 +47,7 @@ const CONFIG = {
             2: 1.2,  // Phase 2: 20% bonus
             3: 1.5   // Phase 3: 50% bonus
         },
-        TIME_BONUS_MULTIPLIER: 10 // Points per line cleared * remaining seconds
+        TIME_BONUS_MULTIPLIER: 1 // Points per line cleared * remaining seconds
     },
     COLORS: {
         I: '#00f0f0', // Cyan
