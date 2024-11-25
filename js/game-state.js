@@ -141,33 +141,40 @@ class GameState {
     }
 
     clearLines() {
-        let linesCleared = 0;
         let clearedRows = [];
 
-        // Find completed lines
+        // Find completed lines from bottom to top
         for (let row = CONFIG.BOARD.HEIGHT - 1; row >= 0; row--) {
             if (this.board[row].every(cell => cell !== 0)) {
                 clearedRows.push(row);
-                linesCleared++;
             }
         }
 
-        if (linesCleared === 0) return null;
+        if (clearedRows.length === 0) return null;
 
-        // Remove completed lines
+        // Calculate score before modifying the board
+        const scoreResult = this.scoring.calculateLinesClear(clearedRows.length);
+        
+        // Sort rows in descending order to remove from bottom to top
+        clearedRows.sort((a, b) => b - a);
+        
+        // Remove all completed lines at once
         clearedRows.forEach(row => {
             this.board.splice(row, 1);
-            this.board.unshift(Array(CONFIG.BOARD.WIDTH).fill(0));
         });
+        
+        // Add new empty lines at the top
+        for (let i = 0; i < clearedRows.length; i++) {
+            this.board.unshift(Array(CONFIG.BOARD.WIDTH).fill(0));
+        }
 
-        // Calculate score and update total lines cleared
-        const scoreResult = this.scoring.calculateLinesClear(linesCleared);
-        this.linesCleared += linesCleared;
+        // Update total lines cleared and score
+        this.linesCleared += clearedRows.length;
         this.score = this.scoring.getScore();
         
         return {
             lines: clearedRows,
-            count: linesCleared,
+            count: clearedRows.length,
             points: scoreResult.points,
             combo: scoreResult.combo
         };

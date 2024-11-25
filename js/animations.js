@@ -9,10 +9,10 @@ class AnimationManager {
         
         const animationId = Symbol('linesClear');
         this.activeAnimations.add(animationId);
+        const allBlocks = [];
 
-        // Create flash effect for each row
+        // Create flash effect for all rows simultaneously
         clearResult.lines.forEach(row => {
-            const rowBlocks = [];
             for (let x = 0; x < CONFIG.BOARD.WIDTH; x++) {
                 const block = document.createElement('div');
                 block.className = 'lines-clear';
@@ -23,16 +23,16 @@ class AnimationManager {
                 block.style.height = `${CONFIG.BOARD.BLOCK_SIZE}px`;
                 block.style.backgroundColor = '#fff';
                 document.getElementById('game-canvas').appendChild(block);
-                rowBlocks.push(block);
+                allBlocks.push(block);
             }
-
-            // Remove blocks after animation
-            setTimeout(() => {
-                rowBlocks.forEach(block => block.remove());
-                if (callback) callback();
-                this.activeAnimations.delete(animationId);
-            }, 300);
         });
+
+        // Remove all blocks after animation completes
+        setTimeout(() => {
+            allBlocks.forEach(block => block.remove());
+            if (callback) callback();
+            this.activeAnimations.delete(animationId);
+        }, 150); // Reduced animation time for snappier feedback
     }
 
     playScorePopup(points, x, y) {
