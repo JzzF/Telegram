@@ -48,14 +48,44 @@ body {
 }
 
 /* Start Screen */
+#start-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+}
+
 #start-screen h1 {
     font-size: 2.5em;
     margin-bottom: 30px;
     color: var(--tg-theme-button-color);
 }
 
+.glow-button {
+    background-color: var(--tg-theme-button-color);
+    color: var(--tg-theme-button-text-color);
+    border: none;
+    border-radius: 8px;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    cursor: pointer;
+    margin: 10px;
+    transition: all 0.3s ease;
+}
+
+.glow-button:hover {
+    box-shadow: 0 0 10px var(--tg-theme-button-color);
+}
+
+.glow-button:active {
+    transform: scale(0.95);
+}
+
 .instructions {
     display: none;
+    margin-top: 20px;
 }
 
 .controls-guide {
@@ -100,9 +130,22 @@ body {
     align-items: flex-start;
 }
 
-#game-canvas {
+#canvas-container {
+    position: relative;
+    width: 100%;
+    max-width: min(100vw - 20px, calc(100vh - 150px) * 0.5);
+    aspect-ratio: 1/2;
+    margin: 0 auto;
+}
+
+canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     border: 2px solid var(--game-border-color);
-    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
 }
 
 .side-panel {
@@ -167,6 +210,11 @@ body {
     align-items: center;
     justify-content: center;
     touch-action: manipulation;
+    cursor: pointer;
+}
+
+.control-button:active {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Game Over Screen */
@@ -236,4 +284,9 @@ body {
         width: 60px;
         height: 60px;
     }
+}
+
+/* Hide elements by default */
+.hidden {
+    display: none !important;
 }

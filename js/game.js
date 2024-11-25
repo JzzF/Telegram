@@ -1,29 +1,68 @@
 class Game {
     constructor() {
         this.gameState = new GameState();
-        this.renderer = new Renderer(
-            document.getElementById('game-canvas'),
-            document.getElementById('preview-canvas')
-        );
+        this.renderer = new Renderer(document.getElementById('game-canvas'));
         this.audioManager = new AudioManager();
-        this.animationManager = new AnimationManager(this);
-        this.controls = new Controls(this);
         this.setupEventListeners();
+        this.initializeGame();
     }
 
     setupEventListeners() {
-        document.getElementById('start-button').addEventListener('click', () => this.start());
-        document.getElementById('retry-button').addEventListener('click', () => this.restart());
-        document.getElementById('quit-button').addEventListener('click', () => {
-            if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.close();
-            }
-        });
+        // Start button
+        const startButton = document.getElementById('start-button');
+        if (startButton) {
+            startButton.addEventListener('click', () => this.start());
+        }
+
+        // Restart button
+        const restartButton = document.getElementById('restart-button');
+        if (restartButton) {
+            restartButton.addEventListener('click', () => this.restart());
+        }
+
+        // Share button
+        const shareButton = document.getElementById('share-button');
+        if (shareButton) {
+            shareButton.addEventListener('click', () => this.shareScore());
+        }
+
+        // Mobile controls
+        const leftButton = document.getElementById('left-button');
+        const rightButton = document.getElementById('right-button');
+        const rotateButton = document.getElementById('rotate-button');
+        const downButton = document.getElementById('down-button');
+
+        if (leftButton) leftButton.addEventListener('touchstart', () => this.moveLeft());
+        if (rightButton) rightButton.addEventListener('touchstart', () => this.moveRight());
+        if (rotateButton) rotateButton.addEventListener('touchstart', () => this.rotate());
+        if (downButton) downButton.addEventListener('touchstart', () => this.moveDown());
+    }
+
+    initializeGame() {
+        // Show start screen, hide others
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
+
+        if (startScreen) startScreen.style.display = 'flex';
+        if (gameScreen) gameScreen.style.display = 'none';
+        if (gameOverScreen) gameOverScreen.style.display = 'none';
+
+        // Initialize canvas
+        const canvas = document.getElementById('game-canvas');
+        if (canvas) {
+            canvas.width = 300;
+            canvas.height = 600;
+        }
     }
 
     start() {
-        document.getElementById('start-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        
+        if (startScreen) startScreen.style.display = 'none';
+        if (gameScreen) gameScreen.style.display = 'block';
+        
         this.gameState.reset();
         this.audioManager.startMusic();
         this.spawnPiece();
@@ -32,8 +71,12 @@ class Game {
     }
 
     restart() {
-        document.getElementById('game-over-screen').classList.add('hidden');
-        document.getElementById('game-screen').classList.remove('hidden');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const gameScreen = document.getElementById('game-screen');
+        
+        if (gameOverScreen) gameOverScreen.style.display = 'none';
+        if (gameScreen) gameScreen.style.display = 'block';
+        
         this.gameState.reset();
         this.audioManager.startMusic();
         this.spawnPiece();
@@ -149,6 +192,18 @@ class Game {
                 localStorage.setItem('highScore', this.gameState.score.toString());
             }
         });
+    }
+
+    shareScore() {
+        if (window.Telegram?.WebApp) {
+            const score = this.gameState.score;
+            const message = `🎮 I scored ${score} points in Time Attack Tetris!\n\nCan you beat my score? Try now:`;
+            window.Telegram.WebApp.sendData(JSON.stringify({
+                type: 'share_score',
+                score: score,
+                message: message
+            }));
+        }
     }
 
     cleanup() {
