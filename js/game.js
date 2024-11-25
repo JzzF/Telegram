@@ -41,28 +41,8 @@ class Game {
         this.gameLoop();
     }
 
-    pause() {
-        this.gameState.paused = !this.gameState.paused;
-        if (this.gameState.paused) {
-            // Show pause overlay
-            const overlay = document.createElement('div');
-            overlay.id = 'pause-overlay';
-            overlay.className = 'screen';
-            overlay.innerHTML = '<h2>Paused</h2><button id="resume-btn">Resume</button>';
-            document.body.appendChild(overlay);
-            
-            document.getElementById('resume-btn').addEventListener('click', () => this.pause());
-        } else {
-            // Remove pause overlay
-            const overlay = document.getElementById('pause-overlay');
-            if (overlay) overlay.remove();
-            this.lastTime = performance.now();
-            this.gameLoop();
-        }
-    }
-
     gameLoop(currentTime = performance.now()) {
-        if (this.gameState.gameOver || this.gameState.paused) return;
+        if (this.gameState.gameOver) return;
 
         const deltaTime = currentTime - this.lastTime;
         this.lastTime = currentTime;

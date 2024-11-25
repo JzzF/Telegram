@@ -3,6 +3,8 @@ class Controls {
         this.game = game;
         this.touchStartX = null;
         this.touchStartY = null;
+        this.lastMoveTime = null;
+        this.hasMoved = false;
         this.setupControls();
     }
 
@@ -12,9 +14,14 @@ class Controls {
         
         // Touch controls
         const gameCanvas = document.getElementById('game-canvas');
-        gameCanvas.addEventListener('touchstart', this.handleTouchStart.bind(this));
-        gameCanvas.addEventListener('touchmove', this.handleTouchMove.bind(this));
-        gameCanvas.addEventListener('touchend', this.handleTouchEnd.bind(this));
+        gameCanvas.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+        gameCanvas.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+        gameCanvas.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+
+        // Prevent default touch behaviors on game area
+        document.getElementById('game-screen').addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
 
         // Button controls
         document.getElementById('left-btn').addEventListener('click', () => this.game.movePiece(-1, 0));
@@ -23,20 +30,22 @@ class Controls {
         document.getElementById('soft-drop-btn').addEventListener('click', () => this.game.movePiece(0, 1));
         document.getElementById('hard-drop-btn').addEventListener('click', () => this.game.hardDrop());
 
-        // Telegram WebApp back button
+        // Initialize Telegram WebApp settings
         if (window.Telegram?.WebApp) {
+            // Disable swipe to back gesture
+            window.Telegram.WebApp.setBackgroundColor('#000000');
+            window.Telegram.WebApp.expand();
+            window.Telegram.WebApp.enableClosingConfirmation();
+            
+            // Handle back button
             window.Telegram.WebApp.BackButton.onClick(() => {
-                if (this.game.state === 'playing') {
-                    this.game.pause();
-                } else {
-                    window.Telegram.WebApp.close();
-                }
+                window.Telegram.WebApp.close();
             });
         }
     }
 
     handleKeyDown(event) {
-        if (this.game.gameState.gameOver || this.game.gameState.paused) return;
+        if (this.game.gameState.gameOver) return;
 
         switch (event.code) {
             case 'ArrowLeft':
@@ -59,71 +68,66 @@ class Controls {
                 event.preventDefault();
                 this.game.hardDrop();
                 break;
-            case 'Escape':
-                event.preventDefault();
-                this.game.pause();
-                break;
         }
     }
 
     handleTouchStart(event) {
-        if (this.game.gameState.gameOver || this.game.gameState.paused) return;
+        if (this.game.gameState.gameOver) return;
         
+        event.preventDefault();
         const touch = event.touches[0];
         this.touchStartX = touch.clientX;
         this.touchStartY = touch.clientY;
         this.lastMoveTime = Date.now();
+        this.hasMoved = false;
     }
 
     handleTouchMove(event) {
         if (!this.touchStartX || !this.touchStartY) return;
-
+        
+        event.preventDefault();
         const touch = event.touches[0];
         const deltaX = touch.clientX - this.touchStartX;
         const deltaY = touch.clientY - this.touchStartY;
-        const now = Date.now();
-
-        // Require minimum movement to trigger action
+        const currentTime = Date.now();
+        
+        // Minimum distance required for a swipe (in pixels)
         const minSwipeDistance = 30;
         
-        // Handle horizontal swipes
-        if (Math.abs(deltaX) > minSwipeDistance && now - this.lastMoveTime > 100) {
-            if (deltaX > 0) {
-                this.game.movePiece(1, 0);
-            } else {
-                this.game.movePiece(-1, 0);
+        // Minimum time between moves (in milliseconds)
+        const moveDelay = 100;
+        
+        if (currentTime - this.lastMoveTime > moveDelay) {
+            // Horizontal movement
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+                if (deltaX > 0) {
+                    this.game.movePiece(1, 0);
+                } else {
+                    this.game.movePiece(-1, 0);
+                }
+                this.touchStartX = touch.clientX;
+                this.lastMoveTime = currentTime;
+                this.hasMoved = true;
             }
-            this.touchStartX = touch.clientX;
-            this.lastMoveTime = now;
-        }
-
-        // Handle vertical swipes (soft drop)
-        if (deltaY > minSwipeDistance && now - this.lastMoveTime > 50) {
-            this.game.movePiece(0, 1);
-            this.touchStartY = touch.clientY;
-            this.lastMoveTime = now;
+            // Vertical movement (downward for hard drop)
+            else if (deltaY > minSwipeDistance && deltaY > Math.abs(deltaX)) {
+                this.game.hardDrop();
+                this.touchStartY = touch.clientY;
+                this.lastMoveTime = currentTime;
+                this.hasMoved = true;
+            }
         }
     }
 
     handleTouchEnd(event) {
-        if (!this.touchStartX || !this.touchStartY) return;
-
-        const touch = event.changedTouches[0];
-        const deltaX = touch.clientX - this.touchStartX;
-        const deltaY = touch.clientY - this.touchStartY;
-        const moveDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-        // Tap detection for rotation
-        if (moveDistance < 10) {
+        event.preventDefault();
+        // If no movement was made, treat it as a tap for rotation
+        if (!this.hasMoved && this.touchStartX !== null) {
             this.game.rotatePiece();
         }
-        // Quick swipe up for hard drop
-        else if (deltaY < -50 && Math.abs(deltaY) > Math.abs(deltaX)) {
-            this.game.hardDrop();
-        }
-
         this.touchStartX = null;
         this.touchStartY = null;
+        this.hasMoved = false;
     }
 
     cleanup() {

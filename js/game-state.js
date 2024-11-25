@@ -12,7 +12,6 @@ class GameState {
         );
         this.currentPiece = null;
         this.gameOver = false;
-        this.paused = false;
         this.score = 0;
         this.combo = 0;
         this.linesCleared = 0;
