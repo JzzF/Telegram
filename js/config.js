@@ -50,16 +50,16 @@ const CONFIG = {
         TIME_BONUS_MULTIPLIER: 1 // Points per line cleared * remaining seconds
     },
     COLORS: {
-        I: '#00f0f0', // Cyan
-        O: '#f0f000', // Yellow
-        T: '#a000f0', // Purple
-        S: '#00f000', // Green
-        Z: '#f00000', // Red
-        J: '#0000f0', // Blue
-        L: '#f0a000'  // Orange
+        1: '#00f0f0', // I - Cyan
+        2: '#f0f000', // O - Yellow
+        3: '#a000f0', // T - Purple
+        4: '#00f000', // S - Green
+        5: '#f00000', // Z - Red
+        6: '#0000f0', // J - Blue
+        7: '#f0a000'  // L - Orange
     },
+    GRID_LINE_COLOR: 'rgba(255, 255, 255, 0.2)',
     INITIAL_DELAY: 1000,
     SOFT_DROP_MULTIPLIER: 20,
-    GRID_LINE_COLOR: 'rgba(255, 255, 255, 0.1)',
     GHOST_PIECE_OPACITY: 0.3
 };
