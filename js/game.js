@@ -17,7 +17,7 @@ class Game {
         // Restart button
         const restartButton = document.getElementById('restart-button');
         if (restartButton) {
-            restartButton.addEventListener('click', () => this.restart());
+            restartButton.addEventListener('click', () => this.start());
         }
 
         // Share button
@@ -87,9 +87,11 @@ class Game {
     start() {
         const startScreen = document.getElementById('start-screen');
         const gameScreen = document.getElementById('game-screen');
+        const gameOverScreen = document.getElementById('game-over-screen');
         
         if (startScreen) startScreen.style.display = 'none';
         if (gameScreen) gameScreen.style.display = 'block';
+        if (gameOverScreen) gameOverScreen.style.display = 'none';
         
         this.gameState.reset();
         this.spawnPiece();
@@ -98,14 +100,7 @@ class Game {
     }
 
     spawnPiece() {
-        const piece = this.gameState.tetrominoGenerator.getNextPiece();
-        this.gameState.currentPiece = {
-            type: piece,
-            x: Math.floor(CONFIG.BOARD.WIDTH / 2) - Math.floor(piece[0].length / 2),
-            y: 0,
-            rotation: 0
-        };
-
+        this.gameState.currentPiece = this.gameState.tetrominoGenerator.getNextPiece();
         if (this.checkCollision(this.gameState.currentPiece)) {
             this.gameOver();
         }
@@ -139,6 +134,16 @@ class Game {
         }
     }
 
+    hardDrop() {
+        if (!this.gameState.currentPiece || this.gameState.gameOver) return;
+        
+        while (!this.checkCollision(this.gameState.currentPiece)) {
+            this.gameState.currentPiece.y++;
+        }
+        this.gameState.currentPiece.y--;
+        this.lockPiece();
+    }
+
     rotate() {
         if (!this.gameState.currentPiece || this.gameState.gameOver) return;
         
@@ -146,12 +151,27 @@ class Game {
         this.gameState.currentPiece.rotation = (this.gameState.currentPiece.rotation + 1) % 4;
         
         if (this.checkCollision(this.gameState.currentPiece)) {
-            this.gameState.currentPiece.rotation = oldRotation;
+            // Try wall kick
+            const kicks = [-1, 1, -2, 2];
+            let kicked = false;
+            
+            for (const kick of kicks) {
+                this.gameState.currentPiece.x += kick;
+                if (!this.checkCollision(this.gameState.currentPiece)) {
+                    kicked = true;
+                    break;
+                }
+                this.gameState.currentPiece.x -= kick;
+            }
+            
+            if (!kicked) {
+                this.gameState.currentPiece.rotation = oldRotation;
+            }
         }
     }
 
     checkCollision(piece) {
-        const matrix = this.rotatePiece(piece.type, piece.rotation);
+        const matrix = this.renderer.rotatePiece(piece.shape, piece.rotation);
         for (let y = 0; y < matrix.length; y++) {
             for (let x = 0; x < matrix[y].length; x++) {
                 if (matrix[y][x]) {
@@ -169,23 +189,14 @@ class Game {
         return false;
     }
 
-    rotatePiece(matrix, rotation) {
-        for (let i = 0; i < rotation; i++) {
-            matrix = matrix[0].map((_, index) =>
-                matrix.map(row => row[index]).reverse()
-            );
-        }
-        return matrix;
-    }
-
     lockPiece() {
-        const matrix = this.rotatePiece(this.gameState.currentPiece.type, this.gameState.currentPiece.rotation);
+        const matrix = this.renderer.rotatePiece(this.gameState.currentPiece.shape, this.gameState.currentPiece.rotation);
         for (let y = 0; y < matrix.length; y++) {
             for (let x = 0; x < matrix[y].length; x++) {
                 if (matrix[y][x]) {
                     const boardY = this.gameState.currentPiece.y + y;
                     if (boardY >= 0) {
-                        this.gameState.board[boardY][this.gameState.currentPiece.x + x] = matrix[y][x];
+                        this.gameState.board[boardY][this.gameState.currentPiece.x + x] = this.gameState.currentPiece.type;
                     }
                 }
             }

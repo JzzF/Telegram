@@ -38,7 +38,10 @@ class TetrominoGenerator {
     constructor() {
         this.pieces = [
             [ // I
-                [1, 1, 1, 1]
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
             ],
             [ // O
                 [1, 1],
@@ -46,23 +49,28 @@ class TetrominoGenerator {
             ],
             [ // T
                 [0, 1, 0],
-                [1, 1, 1]
+                [1, 1, 1],
+                [0, 0, 0]
             ],
             [ // S
                 [0, 1, 1],
-                [1, 1, 0]
+                [1, 1, 0],
+                [0, 0, 0]
             ],
             [ // Z
                 [1, 1, 0],
-                [0, 1, 1]
+                [0, 1, 1],
+                [0, 0, 0]
             ],
             [ // J
                 [1, 0, 0],
-                [1, 1, 1]
+                [1, 1, 1],
+                [0, 0, 0]
             ],
             [ // L
                 [0, 0, 1],
-                [1, 1, 1]
+                [1, 1, 1],
+                [0, 0, 0]
             ]
         ];
         this.nextPieces = [];
@@ -70,7 +78,10 @@ class TetrominoGenerator {
     }
 
     fillBag() {
-        const newPieces = [...this.pieces];
+        const newPieces = [...Array(7)].map((_, i) => ({
+            type: i + 1,
+            shape: this.pieces[i]
+        }));
         for (let i = newPieces.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [newPieces[i], newPieces[j]] = [newPieces[j], newPieces[i]];
@@ -82,6 +93,13 @@ class TetrominoGenerator {
         if (this.nextPieces.length < 7) {
             this.fillBag();
         }
-        return this.nextPieces.shift();
+        const piece = this.nextPieces.shift();
+        return {
+            type: piece.type,
+            shape: piece.shape,
+            x: Math.floor((CONFIG.BOARD.WIDTH - piece.shape[0].length) / 2),
+            y: 0,
+            rotation: 0
+        };
     }
 }
